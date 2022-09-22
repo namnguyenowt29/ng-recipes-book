@@ -1,0 +1,53 @@
+<div class="row">
+  <div class="col-xs-12 col-md-6 col-md-offset-3">
+    <app-alert
+      (close)="handleCloseAlert()"
+      [message]="errorMessage"
+      *ngIf="errorMessage"
+    ></app-alert>
+    <!-- use dynamic component instead -->
+    <!-- <ng-template appPlaceholder></ng-template> -->
+    <div class="app-loading" *ngIf="loading$ | async">
+      <app-loading-spiner></app-loading-spiner>
+    </div>
+    <form
+      *ngIf="!(loading$ | async)"
+      [formGroup]="authForm"
+      (ngSubmit)="handleSubmit()"
+    >
+      <div class="form-group">
+        <label for="email">E-Mail</label>
+        <input
+          type="email"
+          id="email"
+          class="form-control"
+          formControlName="email"
+          autocomplete="email"
+        />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          class="form-control"
+          formControlName="password"
+          autocomplete="current-password"
+        />
+      </div>
+      <div>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="this.authForm.invalid"
+        >
+          {{ isLoginMode ? "Log in" : "Sign up" }}
+        </button>
+        |
+        <button type="button" class="btn btn-primary" (click)="onSwitchMode()">
+          Switch to {{ isLoginMode ? "Sign up" : "Log in" }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
