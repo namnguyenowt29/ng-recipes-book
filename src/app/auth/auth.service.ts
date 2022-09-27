@@ -1,21 +1,33 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, throwError } from 'rxjs';
+import {
+  //  BehaviorSubject,
+  throwError,
+} from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
+import { AppState } from '../app-store/app.reducer';
 import { AuthResponseData } from './interfaces';
 import { User } from './user.model';
+import { Store } from '@ngrx/store';
+import { authLogin, authLogout } from './store';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private readonly _user = new BehaviorSubject<User | null>(null);
-  public readonly user = this._user.asObservable();
-  private tokenExpirationTimer!: ReturnType<typeof setInterval> | null;
-
-  constructor(private http: HttpClient, private router: Router) {}
+  // private readonly _user = new BehaviorSubject<User | null>(null);
+  // public readonly user = this._user.asObservable();
+  private tokenExpirationTimer:
+    | ReturnType<typeof setInterval>
+    | null
+    | undefined;
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private store: Store<AppState>
+  ) {}
 
   //when the token expires , auto logout
   autoLogout(duration: number) {
@@ -25,7 +37,8 @@ export class AuthService {
   }
 
   logout() {
-    this._user.next(null);
+    // this._user.next(null);
+    this.store.dispatch(authLogout());
     this.router.navigate(['/auth']);
     localStorage.removeItem('user');
     if (this.tokenExpirationTimer) {
@@ -36,7 +49,7 @@ export class AuthService {
   }
 
   autoLogin() {
-    const getDataStorage = localStorage.getItem('uer');
+    const getDataStorage = localStorage.getItem('user');
     const userData: {
       email: string;
       userId: string;
@@ -52,7 +65,15 @@ export class AuthService {
         new Date(userData._tokenExpirationDate)
       );
       if (loadedUser.token) {
-        this._user.next(loadedUser);
+        // this._user.next(loadedUser);
+        this.store.dispatch(
+          authLogin({
+            email: loadedUser.email,
+            userId: loadedUser.userId,
+            token: loadedUser.token,
+            expirationDate: new Date(userData._tokenExpirationDate),
+          })
+        );
         // duration = future date - current date
         const expirationDuration =
           new Date(userData._tokenExpirationDate).getTime() -
@@ -101,10 +122,18 @@ export class AuthService {
     const expirationDate = new Date(
       new Date().getTime() + Number(expiresIn) * 1000
       /* second => mili second */
+    ); // this._user.next(currentUser);
+    this.store.dispatch(
+      authLogin({
+        email: email,
+        userId: userId,
+        token: token,
+        expirationDate: expirationDate,
+      })
     );
-    const currentUser = new User(email, userId, token, expirationDate);
-    this._user.next(currentUser);
     this.autoLogout(+expiresIn * 1000);
+    // save to local storage
+    const currentUser = new User(email, userId, token, expirationDate);
     localStorage.setItem('user', JSON.stringify(currentUser));
   }
 
@@ -112,7 +141,7 @@ export class AuthService {
     let message = '';
     if (!errResponse.error) {
       message = 'an unkown error occurred';
-      throwError(message);
+      throwError(() => new Error(message));
     } else {
       if (errResponse.error.error.message === 'EMAIL_EXISTS') {
         message = 'The email address is already in use by another account.';
@@ -132,6 +161,6 @@ export class AuthService {
         message = 'The user account has been disabled by an administrator.';
       }
     }
-    return throwError(message);
+    return throwError(() => new Error(message));
   }
 }

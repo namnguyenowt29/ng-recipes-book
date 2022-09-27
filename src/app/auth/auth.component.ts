@@ -1,17 +1,17 @@
 import {
   Component,
-  // ComponentFactoryResolver,
   OnDestroy,
-  ViewChild,
+  // ComponentFactoryResolver,
+  // ViewChild,
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
-// import { AlertComponent } from "../shared/alert/alert.component";
 import { LoadingService } from '../shared/loading.service';
-// import { PlaceholderDirective } from "../shared/placeholder/placeholder.directive";
 import { AuthService } from './auth.service';
 import { AuthResponseData } from './interfaces';
+// import { PlaceholderDirective } from "../shared/placeholder/placeholder.directive";
+// import { AlertComponent } from "../shared/alert/alert.component";
 
 @Component({
   selector: 'app-auth',
@@ -22,19 +22,19 @@ export class AuthComponent implements OnDestroy {
   isLoginMode = true;
   authForm: FormGroup;
   errorMessage: string | null = null;
+  loading$ = this.loader.loading;
+  private closeSub!: Subscription;
   // @ViewChild(PlaceholderDirective, {
   //   static: false,
   // })
   // alertHost: PlaceholderDirective;
   // optional: use AuthResponeData<T>
-  loading$ = this.loader.loading;
-  private closeSub!: Subscription;
 
   constructor(
     private router: Router,
     private loader: LoadingService,
     private fb: FormBuilder,
-    private authService: AuthService // private cmpFactoryResolver: ComponentFactoryResolver
+    private authService: AuthService // // deprecated: private cmpFactoryResolver: ComponentFactoryResolver
   ) {
     this.authForm = this.fb.group({
       email: this.fb.control(null, [Validators.required, Validators.email]),
@@ -74,6 +74,10 @@ export class AuthComponent implements OnDestroy {
     this.errorMessage = null;
   }
 
+  ngOnDestroy(): void {
+    if (this.closeSub) this.closeSub.unsubscribe();
+  }
+
   // private showErrorAlert(message: string) {
   //   // remove it in Angular v >= 13, you component directly
   //   const cmpFactory =
@@ -88,8 +92,4 @@ export class AuthComponent implements OnDestroy {
   //     hostVcRef.clear();
   //   });
   // }
-
-  ngOnDestroy(): void {
-    if (this.closeSub) this.closeSub.unsubscribe();
-  }
 }
