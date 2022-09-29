@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from './auth/auth.service';
+import { Store } from '@ngrx/store';
+import { AppState } from './app-store/app.reducer';
+import { authAutoLogin } from './auth/store';
 
 @Component({
   selector: 'app-root',
@@ -7,8 +9,8 @@ import { AuthService } from './auth/auth.service';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent implements OnInit {
-  constructor(private auth: AuthService) {}
-  ngOnInit(): void {
-    this.auth.autoLogin();
+  constructor(private store: Store<AppState>) {}
+  ngOnInit() {
+    this.store.dispatch(authAutoLogin());
   }
 }

@@ -6,7 +6,7 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import { fromEvent, map, Subscription } from 'rxjs';
+import { fromEvent, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-alert',
@@ -16,27 +16,22 @@ import { fromEvent, map, Subscription } from 'rxjs';
 export class AlertComponent implements OnInit, OnDestroy {
   @Input() message: string = '';
   @Output() close = new EventEmitter<void>();
-  private alertSub!: Subscription;
+  private alertSub: Subscription | undefined;
 
   constructor() {}
 
   ngOnInit(): void {
-    this.alertSub = fromEvent(document, 'keydown')
-      .pipe(
-        map((event) => {
-          return event as KeyboardEvent;
-        })
-      )
-      .subscribe((event) => {
+    this.alertSub = fromEvent<KeyboardEvent>(document, 'keydown').subscribe(
+      (event) => {
         if (event.key === 'Escape') this.onClose();
-      });
+      }
+    );
   }
-
   onClose() {
     this.close.emit();
   }
 
-  ngOnDestroy(): void {
-    this.alertSub.unsubscribe();
+  ngOnDestroy() {
+    this.alertSub?.unsubscribe();
   }
 }

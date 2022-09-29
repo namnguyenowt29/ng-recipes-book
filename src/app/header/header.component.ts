@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { map } from 'rxjs';
 import { AppState } from '../app-store/app.reducer';
-import { AuthService } from '../auth/auth.service';
+import { authLogout } from '../auth/store';
+import { fetchRecipes } from '../recipes/store';
 import { DataStorageService } from '../shared/data-storage.service';
 
 @Component({
@@ -13,7 +14,6 @@ export class HeaderComponent implements OnInit {
   isAuthenticated = false;
 
   constructor(
-    private authService: AuthService,
     private dataStorageService: DataStorageService,
     private store: Store<AppState>
   ) {}
@@ -28,7 +28,7 @@ export class HeaderComponent implements OnInit {
   }
 
   handleLogout() {
-    this.authService.logout();
+    this.store.dispatch(authLogout());
   }
 
   onSaveData() {
@@ -36,6 +36,6 @@ export class HeaderComponent implements OnInit {
   }
 
   onFetchData() {
-    this.dataStorageService.fetchRecipes().subscribe();
+    this.store.dispatch(fetchRecipes());
   }
 }

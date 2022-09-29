@@ -1,7 +1,7 @@
-import { NgModule } from "@angular/core";
-import { HTTP_INTERCEPTORS } from "@angular/common/http";
-import { AuthInterceptor } from "../auth/auth-interceptor.service";
-import { NetworkingInterceptor } from "../shared/networking-interceptor.service";
+import { NgModule } from '@angular/core';
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AuthInterceptor } from '../auth/auth-interceptor.service';
+import { NetworkingInterceptor } from '../shared/networking-interceptor.service';
 
 @NgModule({
   providers: [

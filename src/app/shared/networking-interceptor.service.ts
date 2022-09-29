@@ -3,14 +3,14 @@ import {
   HttpHandler,
   HttpInterceptor,
   HttpRequest,
-} from "@angular/common/http";
-import { Injectable } from "@angular/core";
-import { Observable } from "rxjs";
-import { finalize } from "rxjs/operators";
-import { LoadingService } from "./loading.service";
+} from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { finalize } from 'rxjs/operators';
+import { LoadingService } from './loading.service';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class NetworkingInterceptor implements HttpInterceptor {
   constructor(private loader: LoadingService) {}
